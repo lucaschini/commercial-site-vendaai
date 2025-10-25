@@ -24,12 +24,12 @@ export default function LoginPage() {
     try {
       const response = await login(formData);
 
-      // Atualizar o context com os dados do usuário
+      // Atualizar o context
       setAuthUser(response.user);
 
-      // Pequeno delay para garantir que o context foi atualizado
-
+      // Redirecionar (middleware vai garantir que está autenticado)
       router.push("/dashboard");
+      router.refresh(); // Força refresh do server component
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login");
     } finally {

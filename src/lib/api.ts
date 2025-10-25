@@ -1,6 +1,4 @@
-// lib/api.ts
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
+// lib/api.ts - Cliente API Seguro
 interface LoginData {
   email: string;
   password: string;
@@ -12,107 +10,65 @@ interface RegisterData {
   password: string;
 }
 
-interface AuthResponse {
-  access_token: string;
-  token_type: string;
-  user: {
-    id: number;
-    email: string;
-    username: string;
-    is_active: boolean;
-  };
+interface UserResponse {
+  id: number;
+  email: string;
+  username: string;
+  is_active: boolean;
+  created_at: string;
+  custom_text?: string;
 }
 
-// Salvar token no localStorage
-export const setToken = (token: string) => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("token", token);
-  }
-};
-
-// Obter token do localStorage
-export const getToken = (): string | null => {
-  if (typeof window !== "undefined") {
-    return localStorage.getItem("token");
-  }
-  return null;
-};
-
-// Remover token
-export const removeToken = () => {
-  if (typeof window !== "undefined") {
-    localStorage.removeItem("token");
-  }
-};
-
-// Login
-export const login = async (data: LoginData): Promise<AuthResponse> => {
-  console.log("🔵 Iniciando login...");
-
-  const response = await fetch(`${API_URL}/auth/login`, {
+// Login - Agora usa API Route do Next.js
+export const login = async (
+  data: LoginData,
+): Promise<{ user: UserResponse }> => {
+  const response = await fetch("/api/auth/login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include", // Importante para cookies
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
     const error = await response.json();
-    console.error("❌ Erro no login:", error);
-    throw new Error(error.detail || "Erro ao fazer login");
+    throw new Error(error.error || "Erro ao fazer login");
   }
 
-  const result = await response.json();
-  console.log("✅ Login bem-sucedido, salvando token...");
-  setToken(result.access_token);
-
-  // Verificar se token foi salvo
-  const savedToken = getToken();
-  console.log("🔍 Token salvo?", savedToken ? "Sim" : "Não");
-  console.log(result.access_token);
-  console.log("👤 Usuário:", result.user);
-
-  return result;
+  return response.json();
 };
 
 // Registro
-export const register = async (data: RegisterData): Promise<AuthResponse> => {
-  const response = await fetch(`${API_URL}/auth/register`, {
+export const register = async (
+  data: RegisterData,
+): Promise<{ user: UserResponse }> => {
+  const response = await fetch("/api/auth/register", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
     body: JSON.stringify(data),
   });
 
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.detail || "Erro ao fazer registro");
+    throw new Error(error.error || "Erro ao fazer registro");
   }
 
-  const result = await response.json();
-  setToken(result.access_token);
-  return result;
+  return response.json();
 };
 
 // Obter dados do usuário
-export const getMe = async () => {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("Token não encontrado");
-  }
-
-  const response = await fetch(`${API_URL}/auth/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+export const getMe = async (): Promise<UserResponse> => {
+  const response = await fetch("/api/auth/me", {
+    credentials: "include",
   });
 
   if (!response.ok) {
     if (response.status === 401) {
-      removeToken();
       throw new Error("Sessão expirada");
     }
     throw new Error("Erro ao buscar dados do usuário");
@@ -122,22 +78,13 @@ export const getMe = async () => {
 };
 
 // Obter dados do dashboard
-export const getDashboard = async () => {
-  const token = getToken();
-
-  if (!token) {
-    throw new Error("Token não encontrado");
-  }
-
-  const response = await fetch(`${API_URL}/user/dashboard`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+export const getDashboard = async (): Promise<UserResponse> => {
+  const response = await fetch("/api/user/dashboard", {
+    credentials: "include",
   });
 
   if (!response.ok) {
     if (response.status === 401) {
-      removeToken();
       throw new Error("Sessão expirada");
     }
     throw new Error("Erro ao buscar dashboard");
@@ -147,6 +94,9 @@ export const getDashboard = async () => {
 };
 
 // Logout
-export const logout = () => {
-  removeToken();
+export const logout = async () => {
+  await fetch("/api/auth/logout", {
+    method: "POST",
+    credentials: "include",
+  });
 };

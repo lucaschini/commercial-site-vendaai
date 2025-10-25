@@ -1,36 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, loading, isAuthenticated, logout } = useAuth();
-  const [mounted, setMounted] = useState(false);
+  const { user, loading, logout } = useAuth();
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+    router.refresh();
+  };
 
-  useEffect(() => {
-    if (mounted && !loading && !isAuthenticated) {
-      router.push("/login");
-    }
-  }, [mounted, loading, isAuthenticated, router]);
-
-  if (!mounted || loading) {
+  if (loading) {
     return <Loading />;
   }
 
+  // Se não tem usuário, o middleware já vai redirecionar
   if (!user) {
-    return null;
+    return <Loading />;
   }
-
-  const handleLogout = () => {
-    logout();
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">

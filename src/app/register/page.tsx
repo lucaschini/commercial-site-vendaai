@@ -39,13 +39,12 @@ export default function RegisterPage() {
       const { confirmPassword, ...registerData } = formData;
       const response = await register(registerData);
 
-      // Atualizar o context com os dados do usuário
+      // Atualizar o context
       setAuthUser(response.user);
 
-      // Pequeno delay para garantir que o context foi atualizado
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 100);
+      // Redirecionar
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer registro");
     } finally {

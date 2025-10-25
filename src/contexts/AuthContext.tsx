@@ -7,7 +7,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { getMe, logout as logoutApi, getToken } from "@/lib/api";
+import { getMe, logout as logoutApi } from "@/lib/api";
 
 interface User {
   id: number;
@@ -23,7 +23,7 @@ interface AuthContextType {
   loading: boolean;
   isAuthenticated: boolean;
   login: (user: User) => void;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -36,20 +36,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = getToken();
-
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
       try {
         const userData = await getMe();
         setUser(userData);
         setIsAuthenticated(true);
       } catch (error) {
-        console.error("Erro ao verificar autenticação:", error);
+        // Não logado ou sessão expirada
         setIsAuthenticated(false);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -63,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(true);
   };
 
-  const logout = () => {
-    logoutApi();
+  const logout = async () => {
+    await logoutApi();
     setUser(null);
     setIsAuthenticated(false);
   };

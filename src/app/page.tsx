@@ -32,12 +32,10 @@ export default function Home() {
           <Link href="#aplicacoes">Aplicações</Link>
           <Link href="#func">Funcionalidades</Link>
           <Link href="#faq">FAQ</Link>
-          <Link href="#download">
-            <button className="p-4 bg-amber-100 rounded-4xl text-black">
-              Download
-            </button>
-          </Link>
+          <Link href="#download">Download</Link>
         </nav>
+
+        <Link href="/login">Login</Link>
       </header>
 
       <main className="px-4 md:px-8 lg:px-16 xl:px-24">
