@@ -17,511 +17,242 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#7e22ce]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
       </div>
     );
   }
+
   return (
-    <>
-      <header className="flex justify-between items-center p-4">
-        <div className="font-semibold text-3xl">Venda.AI</div>
+    <div className="min-h-screen bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#7e22ce] relative overflow-x-hidden">
+      {/* Background effects */}
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(138,43,226,0.3)_0%,transparent_50%),radial-gradient(circle_at_40%_20%,rgba(59,130,246,0.3)_0%,transparent_50%)] pointer-events-none" />
 
-        <nav className="flex gap-6 items-center">
-          <Link href="#how">Como Funciona</Link>
-          <Link href="#aplicacoes">Aplicações</Link>
-          <Link href="#func">Funcionalidades</Link>
-          <Link href="#faq">FAQ</Link>
-          <Link href="#download">Download</Link>
-        </nav>
-
-        <Link href="/login">Login</Link>
-      </header>
-
-      <main className="px-4 md:px-8 lg:px-16 xl:px-24">
-        {/* Hero Section */}
-        <section className="flex flex-col lg:flex-row items-center justify-center lg:justify-between mt-12 md:mt-20 mb-20 md:mb-32 gap-12 lg:gap-16">
-          <div className="flex flex-col gap-10 max-w-full lg:max-w-xl text-center lg:text-left">
-            <h1 className="text-5xl md:text-6xl font-extrabold text-center px-4">
-              Como nós te ajudamos a <br /> vender melhor <br /> com nossa IA?
-            </h1>
-
-            <p className="[font-family:'Inter',Helvetica] font-normal text-white text-center text-lg md:text-xl tracking-[0] leading-[normal] mb-12 md:mb-16 max-w-lg mx-auto lg:mx-0 px-4">
-              O assistente invisível que analisa suas reuniões e ajuda a fechar
-              mais
-            </p>
+      {/* Header */}
+      <header className="relative z-10 bg-white/10 backdrop-blur-[20px] border-b border-white/20 shadow-[0_4px_30px_rgba(0,0,0,0.1)]">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="font-bold text-3xl text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
+            Venda.AI
           </div>
 
-          <div className="w-full max-w-md lg:max-w-lg h-64 md:h-80 lg:h-96 bg-gradient-to-br from-gray-800 to-black rounded-lg shadow-2xl flex-shrink-0 flex items-center justify-center">
-            <div className="text-white text-center">
-              <div className="w-16 h-16 bg-white/20 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
+          <nav className="hidden md:flex gap-8 text-white">
+            <a href="#how" className="hover:drop-shadow-[0_4px_10px_rgba(255,255,255,0.5)] transition-all">
+              Como Funciona
+            </a>
+            <a href="#aplicacoes" className="hover:drop-shadow-[0_4px_10px_rgba(255,255,255,0.5)] transition-all">
+              Aplicações
+            </a>
+            <a href="#func" className="hover:drop-shadow-[0_4px_10px_rgba(255,255,255,0.5)] transition-all">
+              Funcionalidades
+            </a>
+            <a href="#faq" className="hover:drop-shadow-[0_4px_10px_rgba(255,255,255,0.5)] transition-all">
+              FAQ
+            </a>
+          </nav>
+
+          <Link
+            href="/login"
+            className="bg-white/20 backdrop-blur-lg border border-white/30 text-white px-6 py-2 rounded-full font-semibold hover:bg-white/30 hover:-translate-y-0.5 transition-all duration-300"
+          >
+            Login
+          </Link>
+        </div>
+      </header>
+
+      <main className="relative z-10 px-6 md:px-12 lg:px-24">
+        {/* Hero Section */}
+        <section className="flex flex-col items-center text-center mt-20 mb-32">
+          <h1 className="text-5xl md:text-7xl font-extrabold text-white mb-6 drop-shadow-[0_4px_20px_rgba(0,0,0,0.3)] max-w-5xl">
+            Como nós te ajudamos a <br className="hidden md:block" /> vender melhor <br className="hidden md:block" /> com nossa IA?
+          </h1>
+
+          <p className="text-xl md:text-2xl text-white/90 mb-12 max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
+            O assistente invisível que analisa suas reuniões e ajuda a fechar mais
+          </p>
+
+          <div className="flex gap-4 mb-16">
+            <Link
+              href="/register"
+              className="bg-white/95 hover:bg-white text-[#1e3c72] px-10 py-4 rounded-full font-bold text-lg shadow-[0_8px_25px_rgba(0,0,0,0.2)] hover:shadow-[0_12px_35px_rgba(0,0,0,0.3)] hover:-translate-y-1 transition-all duration-300"
+            >
+              Começar Grátis
+            </Link>
+            <a
+              href="#how"
+              className="bg-white/15 backdrop-blur-lg border-2 border-white/30 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-white/25 hover:-translate-y-1 transition-all duration-300"
+            >
+              Saiba Mais
+            </a>
+          </div>
+
+          {/* Demo Placeholder */}
+          <div className="w-full max-w-4xl h-96 bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] flex items-center justify-center">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-lg rounded-full mx-auto mb-6 flex items-center justify-center">
+                <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
               </div>
-              <p className="text-sm opacity-80">Demo Interativa</p>
+              <p className="text-white/80 text-lg">Demo Interativa</p>
             </div>
           </div>
         </section>
 
-        {/* Como Funciona Section */}
-        <section id="how" className="mb-20 md:mb-32">
+        {/* Como Funciona */}
+        <section id="how" className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-[0_4px_15px_rgba(0,0,0,0.3)]">
               Como Funciona
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Três passos simples para revolucionar suas vendas com inteligência
-              artificial
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
+              Três passos simples para revolucionar suas vendas com inteligência artificial
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8 text-center hover:bg-white/10 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">1</span>
+            {[
+              { num: "1", title: "Conecte", desc: "Integre o Venda.AI às suas plataformas de reunião favoritas. Zoom, Meet, Teams - funciona com todas.", gradient: "from-blue-400 to-purple-500" },
+              { num: "2", title: "Analise", desc: "Nossa IA escuta, processa e identifica oportunidades de venda em tempo real durante suas reuniões.", gradient: "from-purple-500 to-pink-500" },
+              { num: "3", title: "Venda Mais", desc: "Receba insights instantâneos, sugestões de fechamento e follow-ups personalizados para cada cliente.", gradient: "from-pink-500 to-orange-500" },
+            ].map((step) => (
+              <div
+                key={step.num}
+                className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 text-center hover:bg-white/15 hover:-translate-y-2 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+              >
+                <div className={`w-16 h-16 bg-gradient-to-br ${step.gradient} rounded-full mx-auto mb-6 flex items-center justify-center shadow-lg`}>
+                  <span className="text-2xl font-bold text-white">{step.num}</span>
+                </div>
+                <h3 className="text-2xl font-semibold text-white mb-4">{step.title}</h3>
+                <p className="text-white/80 leading-relaxed">{step.desc}</p>
               </div>
-              <h3 className="text-2xl font-semibold text-white mb-4">
-                Conecte
-              </h3>
-              <p className="text-gray-300 leading-relaxed">
-                Integre o Venda.AI às suas plataformas de reunião favoritas.
-                Zoom, Meet, Teams - funciona com todas.
-              </p>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8 text-center hover:bg-white/10 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">2</span>
-              </div>
-              <h3 className="text-2xl font-semibold text-white mb-4">
-                Analise
-              </h3>
-              <p className="text-gray-300 leading-relaxed">
-                Nossa IA escuta, processa e identifica oportunidades de venda em
-                tempo real durante suas reuniões.
-              </p>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8 text-center hover:bg-white/10 transition-all duration-300">
-              <div className="w-16 h-16 bg-gradient-to-br from-pink-500 to-orange-500 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <span className="text-2xl font-bold text-white">3</span>
-              </div>
-              <h3 className="text-2xl font-semibold text-white mb-4">
-                Venda Mais
-              </h3>
-              <p className="text-gray-300 leading-relaxed">
-                Receba insights instantâneos, sugestões de fechamento e
-                follow-ups personalizados para cada cliente.
-              </p>
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* Aplicações Section */}
-        <section id="aplicacoes" className="mb-20 md:mb-32">
+        {/* Aplicações */}
+        <section id="aplicacoes" className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-[0_4px_15px_rgba(0,0,0,0.3)]">
               Aplicações
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
               Versatilidade que se adapta ao seu negócio
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-blue-500/20 rounded-lg mb-4 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-blue-400"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-                </svg>
+            {[
+              { icon: "📧", title: "Vendas B2B", desc: "Analise reuniões comerciais complexas e identifique pontos de dor dos prospects", bg: "bg-blue-500/20" },
+              { icon: "✓", title: "Consultoria", desc: "Capture necessidades dos clientes e gere propostas mais assertivas", bg: "bg-green-500/20" },
+              { icon: "⭐", title: "SaaS", desc: "Otimize demos de produto e identifique features mais valorizadas", bg: "bg-purple-500/20" },
+              { icon: "📊", title: "Imobiliária", desc: "Entenda preferências de clientes e acelere o processo de vendas", bg: "bg-orange-500/20" },
+              { icon: "💰", title: "Financeiro", desc: "Analise perfil de risco e personalize ofertas de produtos financeiros", bg: "bg-red-500/20" },
+              { icon: "🛒", title: "E-commerce", desc: "Melhore atendimento ao cliente e aumente conversão em vendas online", bg: "bg-cyan-500/20" },
+            ].map((app, i) => (
+              <div
+                key={i}
+                className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-2xl p-6 hover:bg-white/15 hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className={`w-12 h-12 ${app.bg} backdrop-blur-lg rounded-lg mb-4 flex items-center justify-center text-2xl`}>
+                  {app.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-white mb-3">{app.title}</h3>
+                <p className="text-white/70 text-sm">{app.desc}</p>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                Vendas B2B
-              </h3>
-              <p className="text-gray-300 text-sm">
-                Analise reuniões comerciais complexas e identifique pontos de
-                dor dos prospects
-              </p>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-green-500/20 rounded-lg mb-4 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-green-400"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                Consultoria
-              </h3>
-              <p className="text-gray-300 text-sm">
-                Capture necessidades dos clientes e gere propostas mais
-                assertivas
-              </p>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-lg mb-4 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-purple-400"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">SaaS</h3>
-              <p className="text-gray-300 text-sm">
-                Otimize demos de produto e identifique features mais valorizadas
-              </p>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-orange-500/20 rounded-lg mb-4 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-orange-400"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                Imobiliária
-              </h3>
-              <p className="text-gray-300 text-sm">
-                Entenda preferências de clientes e acelere o processo de vendas
-              </p>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-red-500/20 rounded-lg mb-4 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-red-400"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zM4 4h16v2H4z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                Financeiro
-              </h3>
-              <p className="text-gray-300 text-sm">
-                Analise perfil de risco e personalize ofertas de produtos
-                financeiros
-              </p>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-              <div className="w-12 h-12 bg-cyan-500/20 rounded-lg mb-4 flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-cyan-400"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                E-commerce
-              </h3>
-              <p className="text-gray-300 text-sm">
-                Melhore atendimento ao cliente e aumente conversão em vendas
-                online
-              </p>
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* Funcionalidades Section */}
-        <section id="func" className="mb-20 md:mb-32">
+        {/* Funcionalidades */}
+        <section id="func" className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-[0_4px_15px_rgba(0,0,0,0.3)]">
               Funcionalidades
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
               Recursos poderosos para turbinar suas vendas
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold text-white mb-3">
-                    Transcrição em Tempo Real
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Converta automaticamente suas conversas em texto com 99% de
-                    precisão, em português e outros idiomas.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold text-white mb-3">
-                    Análise de Sentimentos
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Entenda o humor e a receptividade do cliente durante a
-                    conversa para ajustar sua abordagem.
-                  </p>
+            {[
+              { icon: "🎤", title: "Transcrição em Tempo Real", desc: "Converta automaticamente suas conversas em texto com 99% de precisão, em português e outros idiomas.", gradient: "from-blue-500 to-purple-500" },
+              { icon: "😊", title: "Análise de Sentimentos", desc: "Entenda o humor e a receptividade do cliente durante a conversa para ajustar sua abordagem.", gradient: "from-purple-500 to-pink-500" },
+              { icon: "💡", title: "Insights Instantâneos", desc: "Receba sugestões em tempo real sobre como conduzir a conversa e quais perguntas fazer.", gradient: "from-pink-500 to-orange-500" },
+              { icon: "📄", title: "Relatórios Detalhados", desc: "Gere resumos completos de cada reunião com pontos-chave, próximos passos e oportunidades identificadas.", gradient: "from-orange-500 to-red-500" },
+              { icon: "🔗", title: "Integração CRM", desc: "Sincronize automaticamente com Salesforce, HubSpot, Pipedrive e outros CRMs populares.", gradient: "from-green-500 to-teal-500" },
+              { icon: "🔒", title: "Segurança Total", desc: "Criptografia end-to-end e conformidade com LGPD e GDPR para proteger dados sensíveis.", gradient: "from-teal-500 to-blue-500" },
+            ].map((feature, i) => (
+              <div
+                key={i}
+                className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:-translate-y-1 transition-all duration-300"
+              >
+                <div className="flex items-start gap-4">
+                  <div className={`w-12 h-12 bg-gradient-to-br ${feature.gradient} rounded-lg flex items-center justify-center flex-shrink-0 text-2xl shadow-lg`}>
+                    {feature.icon}
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-semibold text-white mb-3">{feature.title}</h3>
+                    <p className="text-white/80 leading-relaxed">{feature.desc}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold text-white mb-3">
-                    Insights Instantâneos
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Receba sugestões em tempo real sobre como conduzir a
-                    conversa e quais perguntas fazer.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 2 2h16c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold text-white mb-3">
-                    Relatórios Detalhados
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Gere resumos completos de cada reunião com pontos-chave,
-                    próximos passos e oportunidades identificadas.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-teal-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 17l3.5-4.5 2.5 3.01L14.5 11l4.5 6H5z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold text-white mb-3">
-                    Integração CRM
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Sincronize automaticamente com Salesforce, HubSpot,
-                    Pipedrive e outros CRMs populares.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-teal-500 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold text-white mb-3">
-                    Segurança Total
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">
-                    Criptografia end-to-end e conformidade com LGPD e GDPR para
-                    proteger dados sensíveis.
-                  </p>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section id="faq" className="mb-20 md:mb-32">
+        {/* FAQ */}
+        <section id="faq" className="mb-32">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h2 className="text-5xl font-bold text-white mb-6 drop-shadow-[0_4px_15px_rgba(0,0,0,0.3)]">
               Perguntas Frequentes
             </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">
               Tire suas dúvidas sobre o Venda.AI
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-6">
-            <details className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-              <summary className="text-xl font-semibold text-white cursor-pointer flex justify-between items-center">
-                Como o Venda.AI protege a privacidade dos dados?
-                <span className="text-2xl group-open:rotate-45 transition-transform">
-                  +
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                Utilizamos criptografia de ponta a ponta e seguimos
-                rigorosamente as normas da LGPD e GDPR. Todos os dados são
-                processados em servidores seguros e você tem controle total
-                sobre suas informações, podendo deletá-las a qualquer momento.
-              </p>
-            </details>
-
-            <details className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-              <summary className="text-xl font-semibold text-white cursor-pointer flex justify-between items-center">
-                Qual é a precisão da transcrição?
-                <span className="text-2xl group-open:rotate-45 transition-transform">
-                  +
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                Nossa IA tem 99% de precisão na transcrição em português e
-                suporta mais de 30 idiomas. A tecnologia se adapta a diferentes
-                sotaques e contextos de negócio, melhorando continuamente com o
-                uso.
-              </p>
-            </details>
-
-            <details className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-              <summary className="text-xl font-semibold text-white cursor-pointer flex justify-between items-center">
-                Funciona com quais plataformas de reunião?
-                <span className="text-2xl group-open:rotate-45 transition-transform">
-                  +
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                Integramos com Zoom, Google Meet, Microsoft Teams, Webex,
-                GoToMeeting e outras principais plataformas. Também funciona em
-                chamadas telefônicas tradicionais e reuniões presenciais através
-                do app móvel.
-              </p>
-            </details>
-
-            <details className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-              <summary className="text-xl font-semibold text-white cursor-pointer flex justify-between items-center">
-                Existe um período de teste gratuito?
-                <span className="text-2xl group-open:rotate-45 transition-transform">
-                  +
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                Sim! Oferecemos 14 dias grátis com acesso completo a todas as
-                funcionalidades. Não é necessário cartão de crédito para
-                começar. Você pode cancelar a qualquer momento.
-              </p>
-            </details>
-
-            <details className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-              <summary className="text-xl font-semibold text-white cursor-pointer flex justify-between items-center">
-                Como funciona a integração com CRM?
-                <span className="text-2xl group-open:rotate-45 transition-transform">
-                  +
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                A integração é automática e em tempo real. Após cada reunião, os
-                insights e resumos são enviados diretamente para o seu CRM,
-                criando tarefas de follow-up e atualizando o status dos leads
-                automaticamente.
-              </p>
-            </details>
-
-            <details className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group">
-              <summary className="text-xl font-semibold text-white cursor-pointer flex justify-between items-center">
-                Preciso de treinamento para usar a plataforma?
-                <span className="text-2xl group-open:rotate-45 transition-transform">
-                  +
-                </span>
-              </summary>
-              <p className="text-gray-300 mt-4 leading-relaxed">
-                Não! O Venda.AI foi desenvolvido para ser intuitivo e fácil de
-                usar. Oferecemos onboarding personalizado, tutoriais interativos
-                e suporte 24/7 em português para garantir que você aproveite ao
-                máximo a plataforma desde o primeiro dia.
-              </p>
-            </details>
+          <div className="max-w-4xl mx-auto space-y-4">
+            {[
+              { q: "Como o Venda.AI protege a privacidade dos dados?", a: "Utilizamos criptografia de ponta a ponta e seguimos rigorosamente as normas da LGPD e GDPR." },
+              { q: "Qual é a precisão da transcrição?", a: "Nossa IA tem 99% de precisão na transcrição em português e suporta mais de 30 idiomas." },
+              { q: "Funciona com quais plataformas de reunião?", a: "Integramos com Zoom, Google Meet, Microsoft Teams, Webex, GoToMeeting e outras principais plataformas." },
+              { q: "Existe um período de teste gratuito?", a: "Sim! Oferecemos 14 dias grátis com acesso completo a todas as funcionalidades." },
+            ].map((faq, i) => (
+              <details key={i} className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-2xl p-6 hover:bg-white/15 transition-all duration-300 group">
+                <summary className="text-xl font-semibold text-white cursor-pointer flex justify-between items-center">
+                  {faq.q}
+                  <span className="text-2xl group-open:rotate-45 transition-transform">+</span>
+                </summary>
+                <p className="text-white/80 mt-4 leading-relaxed">{faq.a}</p>
+              </details>
+            ))}
           </div>
         </section>
 
-        {/* Download/CTA Section */}
-        <section id="download" className="mb-20 text-center">
-          <div className="backdrop-blur-lg bg-white/5 border border-white/20 rounded-3xl p-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        {/* CTA Final */}
+        <section className="mb-20 text-center">
+          <div className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-12 shadow-[0_8px_32px_rgba(0,0,0,0.2)]">
+            <h2 className="text-5xl font-bold text-white mb-6">
               Pronto para vender mais?
             </h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
-              Junte-se a milhares de vendedores que já aumentaram suas
-              conversões com o Venda.AI
+            <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
+              Junte-se a milhares de vendedores que já aumentaram suas conversões com o Venda.AI
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 shadow-lg">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                href="/register"
+                className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-2xl hover:from-blue-600 hover:to-purple-600 hover:-translate-y-1 transition-all duration-300 shadow-lg"
+              >
                 Começar Teste Gratuito
-              </button>
-              <button className="px-8 py-4 backdrop-blur-lg bg-white/10 border border-white/20 text-white font-semibold rounded-2xl hover:bg-white/20 transition-all duration-300">
+              </Link>
+              <button className="px-8 py-4 bg-white/10 backdrop-blur-lg border border-white/20 text-white font-semibold rounded-2xl hover:bg-white/20 hover:-translate-y-1 transition-all duration-300">
                 Agendar Demo
               </button>
             </div>
           </div>
         </section>
       </main>
-    </>
+    </div>
   );
 }
