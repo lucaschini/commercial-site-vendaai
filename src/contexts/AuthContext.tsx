@@ -7,7 +7,7 @@ import {
   useEffect,
   ReactNode,
 } from "react";
-import { getMe, logout as logoutApi } from "@/lib/api";
+import { getMe, logout as logoutApi } from "@/lib/api-dual";
 
 interface User {
   id: number;

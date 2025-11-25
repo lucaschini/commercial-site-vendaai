@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { login } from "@/lib/api";
+import { login } from "@/lib/api-dual";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 

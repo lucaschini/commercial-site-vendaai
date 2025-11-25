@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { register } from "@/lib/api";
+import { register } from "@/lib/api-dual";
 import { useAuth } from "@/contexts/AuthContext";
 import Link from "next/link";
 
@@ -53,12 +53,22 @@ export default function RegisterPage() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(138,43,226,0.3)_0%,transparent_50%),radial-gradient(circle_at_40%_20%,rgba(59,130,246,0.3)_0%,transparent_50%)] pointer-events-none" />
 
       {/* Close button */}
-      <Link 
+      <Link
         href="/"
         className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-10"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </Link>
 
@@ -67,9 +77,7 @@ export default function RegisterPage() {
         <div className="bg-[rgba(30,60,114,0.5)] backdrop-blur-[20px] rounded-[25px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-2">
-              Criar conta
-            </h2>
+            <h2 className="text-3xl font-bold text-white mb-2">Criar conta</h2>
             <p className="text-white/80 text-sm">
               Preencha os dados para começar
             </p>
