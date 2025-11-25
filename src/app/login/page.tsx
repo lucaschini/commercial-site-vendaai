@@ -23,13 +23,9 @@ export default function LoginPage() {
 
     try {
       const response = await login(formData);
-
-      // Atualizar o context
       setAuthUser(response.user);
-
-      // Redirecionar (middleware vai garantir que está autenticado)
       router.push("/dashboard");
-      router.refresh(); // Força refresh do server component
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao fazer login");
     } finally {
@@ -37,89 +33,118 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    // Implementar login com Google
+    console.log("Google login");
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Bem-vindo de volta
-          </h1>
-          <p className="text-gray-600">
-            Entre com suas credenciais para continuar
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#7e22ce] flex items-center justify-center px-4 relative overflow-hidden">
+      {/* Background effects */}
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(138,43,226,0.3)_0%,transparent_50%),radial-gradient(circle_at_40%_20%,rgba(59,130,246,0.3)_0%,transparent_50%)] pointer-events-none" />
 
-        {/* Erro */}
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-600 text-sm">{error}</p>
+      {/* Close button */}
+      <Link
+        href="/"
+        className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-10"
+      >
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </Link>
+
+      {/* Login Card */}
+      <div className="relative z-10 w-full max-w-md">
+        <div className="bg-[rgba(30,60,114,0.5)] backdrop-blur-[20px] rounded-[25px] border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.3)] p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-2">
+              Seja bem vindo
+            </h2>
+            <p className="text-white/80 text-sm">
+              Entre com a sua conta do Google
+            </p>
           </div>
-        )}
 
-        {/* Formulário */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email */}
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/20 backdrop-blur-lg border border-red-500/30 rounded-xl">
+              <p className="text-red-200 text-sm">{error}</p>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email */}
+            <div>
+              <label className="block text-white font-medium text-sm mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
+                className="w-full px-4 py-3 bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl text-white placeholder-white/50 focus:outline-none focus:bg-white/15 focus:border-white/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.1)] transition-all"
+                placeholder="seu@email.com"
+              />
+            </div>
+
+            {/* Password */}
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-white font-medium text-sm">
+                  Senha
+                </label>
+                <a
+                  href="#"
+                  className="text-white/90 hover:text-white text-xs transition-colors"
+                >
+                  Esqueceu sua senha?
+                </a>
+              </div>
+              <input
+                type="password"
+                required
+                value={formData.password}
+                onChange={(e) =>
+                  setFormData({ ...formData, password: e.target.value })
+                }
+                className="w-full px-4 py-3 bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl text-white placeholder-white/50 focus:outline-none focus:bg-white/15 focus:border-white/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.1)] transition-all"
+                placeholder="••••••••"
+              />
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[rgba(139,92,246,0.8)] backdrop-blur-lg hover:bg-[rgba(139,92,246,1)] text-white px-4 py-3 rounded-xl font-semibold border border-white/20 shadow-[0_4px_15px_rgba(139,92,246,0.3)] hover:shadow-[0_6px_20px_rgba(139,92,246,0.4)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
             >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="seu@email.com"
-            />
-          </div>
+              {loading ? "Entrando..." : "Entrar"}
+            </button>
+          </form>
 
-          {/* Senha */}
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Senha
-            </label>
-            <input
-              id="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="••••••••"
-            />
-          </div>
-
-          {/* Botão */}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
-          >
-            {loading ? "Entrando..." : "Entrar"}
-          </button>
-        </form>
-
-        {/* Link para registro */}
-        <div className="mt-6 text-center">
-          <p className="text-gray-600 text-sm">
+          {/* Signup Link */}
+          <p className="text-center text-white/80 text-sm mt-6">
             Não tem uma conta?{" "}
             <Link
               href="/register"
-              className="text-blue-600 hover:text-blue-700 font-semibold"
+              className="text-white font-semibold hover:underline transition-all"
             >
-              Cadastre-se
+              Criar
             </Link>
           </p>
         </div>
