@@ -44,12 +44,22 @@ export default function LoginPage() {
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(138,43,226,0.3)_0%,transparent_50%),radial-gradient(circle_at_40%_20%,rgba(59,130,246,0.3)_0%,transparent_50%)] pointer-events-none" />
 
       {/* Close button */}
-      <Link 
+      <Link
         href="/"
         className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-10"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M6 18L18 6M6 6l12 12"
+          />
         </svg>
       </Link>
 
@@ -64,27 +74,6 @@ export default function LoginPage() {
             <p className="text-white/80 text-sm">
               Entre com a sua conta do Google
             </p>
-          </div>
-
-          {/* Google Button */}
-          <button
-            onClick={handleGoogleLogin}
-            className="w-full bg-white/95 hover:bg-white text-gray-800 px-4 py-3 rounded-xl font-medium shadow-[0_4px_15px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-3 mb-8"
-          >
-            <span className="text-xl font-bold bg-gradient-to-r from-[#4285f4] via-[#ea4335] to-[#34a853] bg-clip-text text-transparent">
-              G
-            </span>
-            <span>Entre com o google</span>
-          </button>
-
-          {/* Divider */}
-          <div className="relative text-center my-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/20"></div>
-            </div>
-            <span className="relative bg-[rgba(30,60,114,0.5)] px-4 text-white/70 text-sm">
-              Ou entre com
-            </span>
           </div>
 
           {/* Error Message */}
