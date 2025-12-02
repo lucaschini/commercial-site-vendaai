@@ -10,9 +10,9 @@ import {
 import { getMe, logout as logoutApi } from "@/lib/api-dual";
 
 interface User {
-  id: number;
-  email: string;
-  username: string;
+  id: string;
+  e_mail: string;
+  nome: string;
   is_active: boolean;
   custom_text?: string;
   created_at: string;

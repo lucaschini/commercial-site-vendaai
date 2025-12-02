@@ -3,12 +3,45 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { sugestoesAPI } from "@/lib/api-client";
+import { SugestaoIA } from "@/types/api";
+import Link from "next/link";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, loading, logout } = useAuth();
   const [showSettings, setShowSettings] = useState(false);
+  const [showSugestoes, setShowSugestoes] = useState(false);
+  const [sugestoes, setSugestoes] = useState<SugestaoIA[]>([]);
+  const [loadingSugestoes, setLoadingSugestoes] = useState(false);
+
+  useEffect(() => {
+    if (showSugestoes) {
+      carregarSugestoes();
+    }
+  }, [showSugestoes]);
+
+  const carregarSugestoes = async () => {
+    setLoadingSugestoes(true);
+    try {
+      const data = await sugestoesAPI.listar(0, 10, false);
+      setSugestoes(data);
+    } catch (error) {
+      console.error("Erro ao carregar sugestões:", error);
+    } finally {
+      setLoadingSugestoes(false);
+    }
+  };
+
+  const aceitarSugestao = async (id: string) => {
+    try {
+      await sugestoesAPI.aceitar(id);
+      carregarSugestoes();
+    } catch (error) {
+      console.error("Erro ao aceitar sugestão:", error);
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -25,47 +58,46 @@ export default function DashboardPage() {
   }
 
   const stats = [
-    { label: "Vendas do Mês", value: "R$ 48.5K", change: "↑ 12%", positive: true },
+    {
+      label: "Vendas do Mês",
+      value: "R$ 48.5K",
+      change: "↑ 12%",
+      positive: true,
+    },
     { label: "Conversões", value: "68%", change: "↑ 8%", positive: true },
     { label: "Leads Ativos", value: "234", change: "↓ 3%", positive: false },
     { label: "Ticket Médio", value: "R$ 580", change: "↑ 15%", positive: true },
   ];
 
-  const insights = [
-    {
-      icon: "🎯",
-      title: "Alta conversão detectada",
-      description: "Você apresentou o produto premium e suas funcionalidades",
-    },
-    {
-      icon: "💰",
-      title: "Atenção ao preço",
-      description: "O possível cliente mostrou interesse, porém o preço pode ser uma objeção",
-    },
-    {
-      icon: "⚠️",
-      title: "Momento crítico",
-      description: "O possível cliente explicou a situação atual da empresa dele",
-    },
-  ];
-
-  const actions = [
-    { icon: "🔍", text: "Pesquisar a empresa dele na internet" },
-    { icon: "💬", text: "Sugerir perguntas para continuar" },
-    { icon: "🎯", text: "Quebra de objeções" },
+  const menuItems = [
+    { icon: "📞", label: "Chamadas", href: "/dashboard/chamadas" },
+    { icon: "👥", label: "Clientes", href: "/dashboard/clientes" },
+    { icon: "💰", label: "Vendas", href: "/dashboard/vendas" },
+    { icon: "💬", label: "Histórico", href: "/dashboard/historico" },
   ];
 
   const activities = [
-    { icon: "✓", title: "Venda concluída - Cliente João Silva", time: "Há 2 horas" },
-    { icon: "📞", title: "Ligação agendada com Maria Santos", time: "Há 4 horas" },
+    {
+      icon: "✓",
+      title: "Venda concluída - Cliente João Silva",
+      time: "Há 2 horas",
+    },
+    {
+      icon: "📞",
+      title: "Ligação agendada com Maria Santos",
+      time: "Há 4 horas",
+    },
     { icon: "📧", title: "Email enviado para 15 leads", time: "Há 6 horas" },
-    { icon: "💡", title: "Novo insight gerado sobre produto X", time: "Há 8 horas" },
+    {
+      icon: "💡",
+      title: "Novo insight gerado sobre produto X",
+      time: "Há 8 horas",
+    },
     { icon: "🎯", title: "Meta mensal atingida em 87%", time: "Ontem" },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#7e22ce] relative overflow-x-hidden">
-      {/* Background effects */}
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(120,119,198,0.3)_0%,transparent_50%),radial-gradient(circle_at_80%_80%,rgba(138,43,226,0.3)_0%,transparent_50%),radial-gradient(circle_at_40%_20%,rgba(59,130,246,0.3)_0%,transparent_50%)] pointer-events-none" />
 
       {/* Header */}
@@ -74,7 +106,33 @@ export default function DashboardPage() {
           <div className="text-2xl font-bold text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
             VendaAI
           </div>
+
+          {/* Menu de Navegação */}
+          <nav className="hidden md:flex items-center gap-6">
+            {menuItems.map((item, i) => (
+              <Link
+                key={i}
+                href={item.href}
+                className="flex items-center gap-2 text-white/90 hover:text-white hover:drop-shadow-[0_2px_10px_rgba(255,255,255,0.5)] transition-all"
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            ))}
+          </nav>
+
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowSugestoes(!showSugestoes)}
+              className="relative bg-white/15 backdrop-blur-lg border border-white/20 text-white px-4 py-2 rounded-xl text-sm hover:bg-white/25 hover:-translate-y-0.5 transition-all duration-300"
+            >
+              💡 Sugestões
+              {sugestoes.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {sugestoes.length}
+                </span>
+              )}
+            </button>
             <button
               onClick={() => setShowSettings(!showSettings)}
               className="bg-white/15 backdrop-blur-lg border border-white/20 text-white px-4 py-2 rounded-xl text-sm hover:bg-white/25 hover:-translate-y-0.5 transition-all duration-300"
@@ -82,7 +140,7 @@ export default function DashboardPage() {
               ⚙️ Configurações
             </button>
             <div className="w-10 h-10 bg-white/20 backdrop-blur-lg border-2 border-white/30 rounded-full flex items-center justify-center text-white font-bold">
-              {user.username?.charAt(0).toUpperCase()}
+              {user.nome?.charAt(0).toUpperCase()}
             </div>
           </div>
         </div>
@@ -93,6 +151,20 @@ export default function DashboardPage() {
         <h1 className="text-3xl font-bold text-white mb-8 drop-shadow-[0_4px_15px_rgba(0,0,0,0.3)]">
           Dashboard
         </h1>
+
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {menuItems.map((item, i) => (
+            <Link
+              key={i}
+              href={item.href}
+              className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-2xl p-6 text-center hover:bg-white/15 hover:-translate-y-1 transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.1)]"
+            >
+              <div className="text-4xl mb-3">{item.icon}</div>
+              <div className="text-white font-semibold">{item.label}</div>
+            </Link>
+          ))}
+        </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -105,7 +177,9 @@ export default function DashboardPage() {
               <div className="text-3xl font-bold text-white mb-2 drop-shadow-[0_2px_10px_rgba(0,0,0,0.2)]">
                 {stat.value}
               </div>
-              <div className={`text-sm font-medium ${stat.positive ? 'text-green-400' : 'text-red-400'}`}>
+              <div
+                className={`text-sm font-medium ${stat.positive ? "text-green-400" : "text-red-400"}`}
+              >
                 {stat.change} vs mês anterior
               </div>
             </div>
@@ -130,74 +204,38 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Insights Card */}
-          <div className="bg-[rgba(139,92,246,0.3)] backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 shadow-[0_8px_32px_rgba(139,92,246,0.2)]">
+          {/* Recent Activity */}
+          <div className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
             <h2 className="text-2xl font-semibold text-white mb-6">
-              💡 Insights
+              📋 Atividades Recentes
             </h2>
-
-            {insights.map((insight, i) => (
-              <div
-                key={i}
-                className="bg-white/15 backdrop-blur-lg border border-white/20 rounded-xl p-4 mb-4 hover:bg-white/20 hover:translate-x-1 transition-all duration-300"
-              >
-                <strong className="block text-white text-lg mb-2">
-                  {insight.icon} {insight.title}
-                </strong>
-                <p className="text-white/90 text-sm leading-relaxed">
-                  {insight.description}
-                </p>
-              </div>
-            ))}
-
-            <div className="mt-6 pt-6 border-t border-white/20">
-              <h3 className="text-lg font-semibold text-white mb-4">
-                Ações Recomendadas
-              </h3>
-              {actions.map((action, i) => (
-                <div
+            <ul className="space-y-2">
+              {activities.slice(0, 5).map((activity, i) => (
+                <li
                   key={i}
-                  className="flex items-center gap-3 bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-3 mb-3 cursor-pointer hover:bg-white/20 hover:translate-x-1 transition-all duration-300"
+                  className="flex items-center gap-3 p-3 border-b border-white/10 last:border-0 hover:bg-white/5 rounded-xl transition-all duration-300"
                 >
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-lg flex-shrink-0">
-                    {action.icon}
+                  <div className="w-8 h-8 bg-[rgba(139,92,246,0.3)] backdrop-blur-lg border border-white/20 rounded-full flex items-center justify-center text-white flex-shrink-0 text-sm">
+                    {activity.icon}
                   </div>
-                  <span className="text-white text-sm">{action.text}</span>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-white text-sm font-medium truncate">
+                      {activity.title}
+                    </div>
+                    <div className="text-white/60 text-xs">{activity.time}</div>
+                  </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
-          <h2 className="text-2xl font-semibold text-white mb-6">
-            📋 Atividades Recentes
-          </h2>
-          <ul className="space-y-2">
-            {activities.map((activity, i) => (
-              <li
-                key={i}
-                className="flex items-center gap-4 p-4 border-b border-white/10 last:border-0 hover:bg-white/5 rounded-xl transition-all duration-300"
-              >
-                <div className="w-10 h-10 bg-[rgba(139,92,246,0.3)] backdrop-blur-lg border border-white/20 rounded-full flex items-center justify-center text-white flex-shrink-0">
-                  {activity.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="text-white font-semibold mb-1">
-                    {activity.title}
-                  </div>
-                  <div className="text-white/60 text-sm">{activity.time}</div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* User Info Card */}
-        <div className="mt-8 bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
+        <div className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.1)]">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-xl font-bold text-white">Informações da Conta</h3>
+            <h3 className="text-xl font-bold text-white">
+              Informações da Conta
+            </h3>
             <button
               onClick={handleLogout}
               className="bg-red-500/80 backdrop-blur-lg hover:bg-red-500 text-white px-6 py-2 rounded-xl font-medium border border-red-500/30 hover:-translate-y-0.5 transition-all duration-300"
@@ -208,11 +246,11 @@ export default function DashboardPage() {
           <div className="space-y-4">
             <div className="flex justify-between items-center py-3 border-b border-white/10">
               <span className="text-white/70">Nome de usuário</span>
-              <span className="text-white font-semibold">{user.username}</span>
+              <span className="text-white font-semibold">{user.nome}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-white/10">
               <span className="text-white/70">Email</span>
-              <span className="text-white font-semibold">{user.email}</span>
+              <span className="text-white font-semibold">{user.e_mail}</span>
             </div>
             <div className="flex justify-between items-center py-3 border-b border-white/10">
               <span className="text-white/70">Status</span>
@@ -228,15 +266,97 @@ export default function DashboardPage() {
         </div>
       </main>
 
-      {/* Settings Modal */}
+      {/* Modal de Sugestões */}
+      {showSugestoes && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowSugestoes(false)}
+        >
+          <div
+            className="bg-[rgba(30,60,114,0.5)] backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold text-white">
+                💡 Sugestões da IA
+              </h3>
+              <button
+                onClick={() => setShowSugestoes(false)}
+                className="text-white/70 hover:text-white"
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {loadingSugestoes ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-white/20 border-t-white mx-auto"></div>
+                <p className="text-white/70 mt-4">Carregando sugestões...</p>
+              </div>
+            ) : sugestoes.length === 0 ? (
+              <div className="text-center py-8">
+                <p className="text-white/70">
+                  Nenhuma sugestão pendente no momento
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {sugestoes.map((sugestao) => (
+                  <div
+                    key={sugestao.id_sugestao}
+                    className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl p-4"
+                  >
+                    <p className="text-white mb-3">{sugestao.conteudo}</p>
+                    {sugestao.momento && (
+                      <p className="text-white/60 text-sm mb-3">
+                        Momento: {sugestao.momento}s
+                      </p>
+                    )}
+                    <button
+                      onClick={() => aceitarSugestao(sugestao.id_sugestao)}
+                      className="bg-green-500/80 hover:bg-green-500 text-white px-4 py-2 rounded-lg text-sm transition-all"
+                    >
+                      ✓ Aceitar Sugestão
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Settings Modal (existente) */}
       {showSettings && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowSettings(false)}>
-          <div className="bg-[rgba(30,60,114,0.5)] backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 max-w-md w-full shadow-[0_8px_32px_rgba(0,0,0,0.3)]" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-2xl font-bold text-white mb-6">Configurações</h3>
-            
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setShowSettings(false)}
+        >
+          <div
+            className="bg-[rgba(30,60,114,0.5)] backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 max-w-md w-full shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-2xl font-bold text-white mb-6">
+              Configurações
+            </h3>
+
             <div className="space-y-6">
               <div>
-                <label className="block text-white/80 text-sm mb-2">Linguagem</label>
+                <label className="block text-white/80 text-sm mb-2">
+                  Linguagem
+                </label>
                 <select className="w-full bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white/50">
                   <option>Português</option>
                   <option>English</option>
@@ -246,28 +366,12 @@ export default function DashboardPage() {
 
               <div>
                 <label className="flex items-center justify-between">
-                  <span className="text-white/80">Transparência do fundo</span>
-                  <input type="checkbox" defaultChecked className="w-12 h-6 rounded-full appearance-none bg-white/20 checked:bg-blue-500 relative cursor-pointer transition-colors" />
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-white/80 text-sm mb-2">Estilo de layout</label>
-                <select className="w-full bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-white/50">
-                  <option>Fixo</option>
-                  <option>Fluido</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-white/80 text-sm mb-3">Tamanho do texto</label>
-                <input type="range" min="12" max="20" defaultValue="16" className="w-full" />
-              </div>
-
-              <div>
-                <label className="flex items-center justify-between">
                   <span className="text-white/80">Notificações</span>
-                  <input type="checkbox" defaultChecked className="w-12 h-6 rounded-full appearance-none bg-white/20 checked:bg-blue-500 relative cursor-pointer transition-colors" />
+                  <input
+                    type="checkbox"
+                    defaultChecked
+                    className="w-12 h-6 rounded-full appearance-none bg-white/20 checked:bg-blue-500 relative cursor-pointer transition-colors"
+                  />
                 </label>
               </div>
             </div>

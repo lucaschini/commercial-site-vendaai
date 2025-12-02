@@ -10,8 +10,8 @@ export default function RegisterPage() {
   const router = useRouter();
   const { login: setAuthUser } = useAuth();
   const [formData, setFormData] = useState({
-    email: "",
-    username: "",
+    e_mail: "",
+    nome: "",
     password: "",
     confirmPassword: "",
   });
@@ -33,7 +33,7 @@ export default function RegisterPage() {
     }
 
     setLoading(true);
-
+    console.log(formData);
     try {
       const { confirmPassword, ...registerData } = formData;
       const response = await register(registerData);
@@ -100,9 +100,9 @@ export default function RegisterPage() {
               <input
                 type="email"
                 required
-                value={formData.email}
+                value={formData.e_mail}
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setFormData({ ...formData, e_mail: e.target.value })
                 }
                 className="w-full px-4 py-3 bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl text-white placeholder-white/50 focus:outline-none focus:bg-white/15 focus:border-white/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.1)] transition-all"
                 placeholder="seu@email.com"
@@ -119,9 +119,9 @@ export default function RegisterPage() {
                 required
                 minLength={3}
                 maxLength={50}
-                value={formData.username}
+                value={formData.nome}
                 onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
+                  setFormData({ ...formData, nome: e.target.value })
                 }
                 className="w-full px-4 py-3 bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl text-white placeholder-white/50 focus:outline-none focus:bg-white/15 focus:border-white/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.1)] transition-all"
                 placeholder="seu_usuario"

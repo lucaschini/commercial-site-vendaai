@@ -10,7 +10,7 @@ export default function LoginPage() {
   const router = useRouter();
   const { login: setAuthUser } = useAuth();
   const [formData, setFormData] = useState({
-    email: "",
+    e_mail: "",
     password: "",
   });
   const [error, setError] = useState("");
@@ -93,9 +93,9 @@ export default function LoginPage() {
               <input
                 type="email"
                 required
-                value={formData.email}
+                value={formData.e_mail}
                 onChange={(e) =>
-                  setFormData({ ...formData, email: e.target.value })
+                  setFormData({ ...formData, e_mail: e.target.value })
                 }
                 className="w-full px-4 py-3 bg-white/10 backdrop-blur-lg border border-white/30 rounded-xl text-white placeholder-white/50 focus:outline-none focus:bg-white/15 focus:border-white/50 focus:shadow-[0_0_0_3px_rgba(255,255,255,0.1)] transition-all"
                 placeholder="seu@email.com"

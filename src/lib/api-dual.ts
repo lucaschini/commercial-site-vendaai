@@ -5,20 +5,20 @@ const isExtension =
   typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id;
 
 interface LoginData {
-  email: string;
+  e_mail: string;
   password: string;
 }
 
 interface RegisterData {
-  email: string;
-  username: string;
+  e_mail: string;
+  nome: string;
   password: string;
 }
 
 interface UserResponse {
-  id: number;
-  email: string;
-  username: string;
+  id: string;
+  e_mail: string;
+  nome: string;
   is_active: boolean;
   created_at: string;
   custom_text?: string;

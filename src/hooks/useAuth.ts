@@ -4,9 +4,9 @@ import { useRouter } from "next/navigation";
 import { getMe, logout as logoutApi, getToken } from "@/lib/api";
 
 interface User {
-  id: number;
-  email: string;
-  username: string;
+  id: string;
+  e_mail: string;
+  nome: string;
   is_active: boolean;
 }
 
