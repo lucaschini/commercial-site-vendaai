@@ -16,6 +16,7 @@ export interface ClienteLead {
   e_mail?: string;
   empresa?: string;
   observacao?: string;
+  id_usuario: string; // NOVO: ID do usuário que criou o cliente
 }
 
 export interface ClienteLeadCreate {

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
-import { clientesAPI } from "@/lib/api-client";
+import { clientesAPI } from "@/lib/api-dual";
 import { ClienteLead, ClienteLeadCreate } from "@/types/api";
 import Link from "next/link";
 
@@ -50,6 +50,7 @@ export default function ClientesPage() {
       if (editingCliente) {
         await clientesAPI.atualizar(editingCliente.id_cliente, formData);
       } else {
+        // O backend adiciona automaticamente o id_usuario usando current_user
         await clientesAPI.criar(formData);
       }
       setShowModal(false);
@@ -57,7 +58,7 @@ export default function ClientesPage() {
       carregarClientes();
     } catch (error) {
       console.error("Erro ao salvar cliente:", error);
-      alert("Erro ao salvar cliente");
+      alert(error instanceof Error ? error.message : "Erro ao salvar cliente");
     }
   };
 

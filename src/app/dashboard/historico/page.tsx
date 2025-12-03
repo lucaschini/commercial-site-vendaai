@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
-import { historicoChatAPI } from "@/lib/api-client";
+import { historicoChatAPI } from "@/lib/api-dual";
 import { HistoricoChat, HistoricoChatCreate } from "@/types/api";
 import Link from "next/link";
 

@@ -1,24 +1,50 @@
-// lib/api-dual.ts - Cliente que funciona em Web e Extensão
+// lib/api-dual.ts - Cliente unificado que funciona em Web e Extensão
 
-// Detectar se está rodando em extensão
+import {
+  Chamada,
+  ChamadaCreate,
+  ChamadaUpdate,
+  ClienteLead,
+  ClienteLeadCreate,
+  ClienteLeadUpdate,
+  HistoricoChat,
+  HistoricoChatCreate,
+  SugestaoIA,
+  SugestaoIACreate,
+  SugestaoIAUpdate,
+  Venda,
+  VendaCreate,
+  VendaUpdate,
+} from "@/types/api";
+
+// ============================================
+// DETECÇÃO DE AMBIENTE
+// ============================================
+
 const isExtension =
   typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id;
 
+const API_URL = isExtension ? "http://localhost:8000" : "";
+
+// ============================================
+// INTERFACES
+// ============================================
+
 interface LoginData {
-  e_mail: string;
+  email: string;
   password: string;
 }
 
 interface RegisterData {
-  e_mail: string;
-  nome: string;
+  email: string;
+  username: string;
   password: string;
 }
 
 interface UserResponse {
-  id: string;
-  e_mail: string;
-  nome: string;
+  id: number;
+  email: string;
+  username: string;
   is_active: boolean;
   created_at: string;
   custom_text?: string;
@@ -30,50 +56,69 @@ interface UserResponse {
 
 async function saveToken(token: string) {
   if (isExtension) {
-    // Extensão: usar chrome.storage
     return new Promise((resolve) => {
       chrome.storage.local.set({ token }, resolve);
     });
-  } else {
-    // Web: O cookie é salvo automaticamente pela API route
-    // Não precisa fazer nada aqui
   }
+  // Web: cookie é salvo automaticamente pela API route
 }
 
 async function getToken(): Promise<string | null> {
   if (isExtension) {
-    // Extensão: buscar do chrome.storage
     return new Promise((resolve) => {
       chrome.storage.local.get(["token"], (result) => {
         resolve(result.token || null);
       });
     });
-  } else {
-    // Web: Cookie é enviado automaticamente
-    return null; // Não precisa retornar, o cookie vai automaticamente
   }
+  return null; // Web: cookie vai automaticamente
 }
 
 async function removeToken() {
   if (isExtension) {
-    // Extensão: remover do chrome.storage
     return new Promise((resolve) => {
       chrome.storage.local.remove(["token"], resolve);
     });
-  } else {
-    // Web: O cookie é removido pela API route
   }
+  // Web: cookie é removido pela API route
 }
 
 // ============================================
-// FUNÇÕES DE API
+// HELPER PARA REQUISIÇÕES
+// ============================================
+
+async function fetchAPI(
+  endpoint: string,
+  options: RequestInit = {},
+): Promise<Response> {
+  const token = await getToken();
+
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+
+  if (isExtension && token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const url = isExtension ? `${API_URL}${endpoint}` : `/api${endpoint}`;
+
+  return fetch(url, {
+    ...options,
+    headers,
+    credentials: isExtension ? undefined : "include",
+  });
+}
+
+// ============================================
+// AUTENTICAÇÃO (existente)
 // ============================================
 
 export const login = async (
   data: LoginData,
 ): Promise<{ user: UserResponse }> => {
   if (isExtension) {
-    // EXTENSÃO: Request direto para o backend
     const response = await fetch("http://localhost:8000/auth/login", {
       method: "POST",
       headers: {
@@ -88,13 +133,9 @@ export const login = async (
     }
 
     const result = await response.json();
-
-    // Salvar token no chrome.storage
     await saveToken(result.access_token);
-
     return { user: result.user };
   } else {
-    // WEB APP: Request para API Route do Next.js (com cookie)
     const response = await fetch("/api/auth/login", {
       method: "POST",
       headers: {
@@ -117,7 +158,6 @@ export const register = async (
   data: RegisterData,
 ): Promise<{ user: UserResponse }> => {
   if (isExtension) {
-    // EXTENSÃO
     const response = await fetch("http://localhost:8000/auth/register", {
       method: "POST",
       headers: {
@@ -133,10 +173,8 @@ export const register = async (
 
     const result = await response.json();
     await saveToken(result.access_token);
-
     return { user: result.user };
   } else {
-    // WEB APP
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: {
@@ -157,7 +195,6 @@ export const register = async (
 
 export const getMe = async (): Promise<UserResponse> => {
   if (isExtension) {
-    // EXTENSÃO
     const token = await getToken();
 
     if (!token) {
@@ -180,7 +217,6 @@ export const getMe = async (): Promise<UserResponse> => {
 
     return response.json();
   } else {
-    // WEB APP
     const response = await fetch("/api/auth/me", {
       credentials: "include",
     });
@@ -195,7 +231,6 @@ export const getMe = async (): Promise<UserResponse> => {
 
 export const getDashboard = async (): Promise<UserResponse> => {
   if (isExtension) {
-    // EXTENSÃO
     const token = await getToken();
 
     if (!token) {
@@ -218,7 +253,6 @@ export const getDashboard = async (): Promise<UserResponse> => {
 
     return response.json();
   } else {
-    // WEB APP
     const response = await fetch("/api/user/dashboard", {
       credentials: "include",
     });
@@ -233,15 +267,272 @@ export const getDashboard = async (): Promise<UserResponse> => {
 
 export const logout = async () => {
   if (isExtension) {
-    // EXTENSÃO
     await removeToken();
   } else {
-    // WEB APP
     await fetch("/api/auth/logout", {
       method: "POST",
       credentials: "include",
     });
   }
+};
+
+// ============================================
+// CLIENTES
+// ============================================
+
+export const clientesAPI = {
+  async listar(skip = 0, limit = 100): Promise<ClienteLead[]> {
+    const response = await fetchAPI(`/clientes?skip=${skip}&limit=${limit}`);
+    if (!response.ok) throw new Error("Erro ao listar clientes");
+    return response.json();
+  },
+
+  async obter(id: string): Promise<ClienteLead> {
+    const response = await fetchAPI(`/clientes/${id}`);
+    if (!response.ok) throw new Error("Erro ao obter cliente");
+    return response.json();
+  },
+
+  async criar(data: ClienteLeadCreate): Promise<ClienteLead> {
+    const response = await fetchAPI("/clientes", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.detail || "Erro ao criar cliente");
+    }
+    return response.json();
+  },
+
+  async atualizar(id: string, data: ClienteLeadUpdate): Promise<ClienteLead> {
+    const response = await fetchAPI(`/clientes/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao atualizar cliente");
+    return response.json();
+  },
+
+  async deletar(id: string): Promise<void> {
+    const response = await fetchAPI(`/clientes/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Erro ao deletar cliente");
+  },
+
+  async buscarPorNome(nome: string): Promise<ClienteLead[]> {
+    const response = await fetchAPI(`/clientes/buscar/nome/${nome}`);
+    if (!response.ok) throw new Error("Erro ao buscar clientes");
+    return response.json();
+  },
+
+  async buscarPorEmpresa(empresa: string): Promise<ClienteLead[]> {
+    const response = await fetchAPI(`/clientes/buscar/empresa/${empresa}`);
+    if (!response.ok) throw new Error("Erro ao buscar clientes");
+    return response.json();
+  },
+};
+
+// ============================================
+// CHAMADAS
+// ============================================
+
+export const chamadasAPI = {
+  async listar(
+    skip = 0,
+    limit = 100,
+    resultado?: string,
+    id_cliente?: string,
+  ): Promise<Chamada[]> {
+    let url = `/chamadas?skip=${skip}&limit=${limit}`;
+    if (resultado) url += `&resultado=${resultado}`;
+    if (id_cliente) url += `&id_cliente=${id_cliente}`;
+
+    const response = await fetchAPI(url);
+    if (!response.ok) throw new Error("Erro ao listar chamadas");
+    return response.json();
+  },
+
+  async obter(id: string): Promise<Chamada> {
+    const response = await fetchAPI(`/chamadas/${id}`);
+    if (!response.ok) throw new Error("Erro ao obter chamada");
+    return response.json();
+  },
+
+  async criar(data: ChamadaCreate): Promise<Chamada> {
+    const response = await fetchAPI("/chamadas", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao criar chamada");
+    return response.json();
+  },
+
+  async atualizar(id: string, data: ChamadaUpdate): Promise<Chamada> {
+    const response = await fetchAPI(`/chamadas/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao atualizar chamada");
+    return response.json();
+  },
+
+  async deletar(id: string): Promise<void> {
+    const response = await fetchAPI(`/chamadas/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Erro ao deletar chamada");
+  },
+};
+
+// ============================================
+// VENDAS
+// ============================================
+
+export const vendasAPI = {
+  async listar(skip = 0, limit = 100, status?: string): Promise<Venda[]> {
+    let url = `/vendas?skip=${skip}&limit=${limit}`;
+    if (status) url += `&status_filter=${status}`;
+
+    const response = await fetchAPI(url);
+    if (!response.ok) throw new Error("Erro ao listar vendas");
+    return response.json();
+  },
+
+  async obter(id: string): Promise<Venda> {
+    const response = await fetchAPI(`/vendas/${id}`);
+    if (!response.ok) throw new Error("Erro ao obter venda");
+    return response.json();
+  },
+
+  async criar(data: VendaCreate): Promise<Venda> {
+    const response = await fetchAPI("/vendas", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao criar venda");
+    return response.json();
+  },
+
+  async atualizar(id: string, data: VendaUpdate): Promise<Venda> {
+    const response = await fetchAPI(`/vendas/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao atualizar venda");
+    return response.json();
+  },
+
+  async deletar(id: string): Promise<void> {
+    const response = await fetchAPI(`/vendas/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Erro ao deletar venda");
+  },
+};
+
+// ============================================
+// HISTÓRICO CHAT
+// ============================================
+
+export const historicoChatAPI = {
+  async listar(skip = 0, limit = 100): Promise<HistoricoChat[]> {
+    const response = await fetchAPI(
+      `/historico-chat?skip=${skip}&limit=${limit}`,
+    );
+    if (!response.ok) throw new Error("Erro ao listar histórico");
+    return response.json();
+  },
+
+  async obter(id: string): Promise<HistoricoChat> {
+    const response = await fetchAPI(`/historico-chat/${id}`);
+    if (!response.ok) throw new Error("Erro ao obter mensagem");
+    return response.json();
+  },
+
+  async criar(data: HistoricoChatCreate): Promise<HistoricoChat> {
+    const response = await fetchAPI("/historico-chat", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao criar mensagem");
+    return response.json();
+  },
+
+  async deletar(id: string): Promise<void> {
+    const response = await fetchAPI(`/historico-chat/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Erro ao deletar mensagem");
+  },
+
+  async limparTudo(): Promise<void> {
+    const response = await fetchAPI("/historico-chat", {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Erro ao limpar histórico");
+  },
+};
+
+// ============================================
+// SUGESTÕES IA
+// ============================================
+
+export const sugestoesAPI = {
+  async listar(
+    skip = 0,
+    limit = 100,
+    aceita?: boolean,
+    id_chamada?: string,
+  ): Promise<SugestaoIA[]> {
+    let url = `/sugestoes?skip=${skip}&limit=${limit}`;
+    if (aceita !== undefined) url += `&aceita=${aceita}`;
+    if (id_chamada) url += `&id_chamada=${id_chamada}`;
+
+    const response = await fetchAPI(url);
+    if (!response.ok) throw new Error("Erro ao listar sugestões");
+    return response.json();
+  },
+
+  async obter(id: string): Promise<SugestaoIA> {
+    const response = await fetchAPI(`/sugestoes/${id}`);
+    if (!response.ok) throw new Error("Erro ao obter sugestão");
+    return response.json();
+  },
+
+  async criar(data: SugestaoIACreate): Promise<SugestaoIA> {
+    const response = await fetchAPI("/sugestoes", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao criar sugestão");
+    return response.json();
+  },
+
+  async atualizar(id: string, data: SugestaoIAUpdate): Promise<SugestaoIA> {
+    const response = await fetchAPI(`/sugestoes/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error("Erro ao atualizar sugestão");
+    return response.json();
+  },
+
+  async aceitar(id: string): Promise<SugestaoIA> {
+    const response = await fetchAPI(`/sugestoes/${id}/aceitar`, {
+      method: "PATCH",
+    });
+    if (!response.ok) throw new Error("Erro ao aceitar sugestão");
+    return response.json();
+  },
+
+  async deletar(id: string): Promise<void> {
+    const response = await fetchAPI(`/sugestoes/${id}`, {
+      method: "DELETE",
+    });
+    if (!response.ok) throw new Error("Erro ao deletar sugestão");
+  },
 };
 
 // Exportar helper para saber se está na extensão

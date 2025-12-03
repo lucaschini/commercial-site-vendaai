@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
 import { useState, useEffect } from "react";
-import { sugestoesAPI } from "@/lib/api-client";
+import { sugestoesAPI } from "@/lib/api-dual";
 import { SugestaoIA } from "@/types/api";
 import Link from "next/link";
 

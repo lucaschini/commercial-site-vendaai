@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
-import { vendasAPI, clientesAPI } from "@/lib/api-client";
+import { vendasAPI, clientesAPI } from "@/lib/api-dual";
 import { Venda, VendaCreate, ClienteLead } from "@/types/api";
 import Link from "next/link";
 
