@@ -37,7 +37,7 @@ export async function GET_VENDA_BY_ID(
   }
 }
 
-export async function PUT_VENDA(
+export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {

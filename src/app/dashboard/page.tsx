@@ -4,7 +4,11 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
 import { useState, useEffect } from "react";
-import { sugestoesAPI } from "@/lib/api-dual";
+import {
+  sugestoesAPI,
+  getDashboardStats,
+  DashboardStats,
+} from "@/lib/api-dual";
 import { SugestaoIA } from "@/types/api";
 import Link from "next/link";
 
@@ -15,12 +19,32 @@ export default function DashboardPage() {
   const [showSugestoes, setShowSugestoes] = useState(false);
   const [sugestoes, setSugestoes] = useState<SugestaoIA[]>([]);
   const [loadingSugestoes, setLoadingSugestoes] = useState(false);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      carregarEstatisticas();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (showSugestoes) {
       carregarSugestoes();
     }
   }, [showSugestoes]);
+
+  const carregarEstatisticas = async () => {
+    setLoadingStats(true);
+    try {
+      const data = await getDashboardStats();
+      setStats(data);
+    } catch (error) {
+      console.error("Erro ao carregar estatísticas:", error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   const carregarSugestoes = async () => {
     setLoadingSugestoes(true);
@@ -49,24 +73,48 @@ export default function DashboardPage() {
     router.refresh();
   };
 
-  if (loading) {
+  if (loading || loadingStats) {
     return <Loading />;
   }
 
-  if (!user) {
+  if (!user || !stats) {
     return <Loading />;
   }
 
-  const stats = [
+  // Calcular variações
+  const variacaoVendas = stats.variacao_vendas;
+  const variacaoClientes =
+    stats.total_clientes_mes_anterior > 0
+      ? ((stats.total_clientes - stats.total_clientes_mes_anterior) /
+          stats.total_clientes_mes_anterior) *
+        100
+      : 0;
+
+  const statsCards = [
     {
       label: "Vendas do Mês",
-      value: "R$ 48.5K",
-      change: "↑ 12%",
+      value: `R$ ${(stats.vendas_mes_atual / 1000).toFixed(1)}K`,
+      change: `${variacaoVendas >= 0 ? "↑" : "↓"} ${Math.abs(variacaoVendas).toFixed(0)}%`,
+      positive: variacaoVendas >= 0,
+    },
+    {
+      label: "Conversões",
+      value: `${stats.conversao_rate.toFixed(0)}%`,
+      change: `${stats.total_vendas_fechadas}/${stats.total_vendas} vendas`,
+      positive: stats.conversao_rate > 50,
+    },
+    {
+      label: "Leads Ativos",
+      value: stats.total_clientes.toString(),
+      change: `${variacaoClientes >= 0 ? "↑" : "↓"} ${Math.abs(variacaoClientes).toFixed(0)}%`,
+      positive: variacaoClientes >= 0,
+    },
+    {
+      label: "Ticket Médio",
+      value: `R$ ${stats.ticket_medio.toFixed(0)}`,
+      change: `${stats.total_vendas} vendas`,
       positive: true,
     },
-    { label: "Conversões", value: "68%", change: "↑ 8%", positive: true },
-    { label: "Leads Ativos", value: "234", change: "↓ 3%", positive: false },
-    { label: "Ticket Médio", value: "R$ 580", change: "↑ 15%", positive: true },
   ];
 
   const menuItems = [
@@ -95,6 +143,12 @@ export default function DashboardPage() {
     },
     { icon: "🎯", title: "Meta mensal atingida em 87%", time: "Ontem" },
   ];
+
+  // Calcular altura máxima para normalizar o gráfico
+  const maxQuantidade = Math.max(
+    ...stats.vendas_por_mes.map((v) => v.quantidade),
+    1,
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#7e22ce] relative overflow-x-hidden">
@@ -148,9 +202,17 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main className="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-white mb-8 drop-shadow-[0_4px_15px_rgba(0,0,0,0.3)]">
-          Dashboard
-        </h1>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-white drop-shadow-[0_4px_15px_rgba(0,0,0,0.3)]">
+            Dashboard
+          </h1>
+          <button
+            onClick={carregarEstatisticas}
+            className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-xl text-sm border border-white/20 transition-all"
+          >
+            🔄 Atualizar
+          </button>
+        </div>
 
         {/* Quick Actions */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -166,9 +228,9 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        {/* Stats Grid */}
+        {/* Stats Grid - DADOS REAIS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, i) => (
+          {statsCards.map((stat, i) => (
             <div
               key={i}
               className="bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-2xl p-6 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:bg-white/15 hover:-translate-y-1 transition-all duration-300"
@@ -180,7 +242,7 @@ export default function DashboardPage() {
               <div
                 className={`text-sm font-medium ${stat.positive ? "text-green-400" : "text-red-400"}`}
               >
-                {stat.change} vs mês anterior
+                {stat.change}
               </div>
             </div>
           ))}
@@ -188,19 +250,43 @@ export default function DashboardPage() {
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Chart Card */}
+          {/* Chart Card - DADOS REAIS */}
           <div className="lg:col-span-2 bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300">
             <h2 className="text-2xl font-semibold text-white mb-6">
-              📊 Performance de Vendas
+              📊 Performance de Vendas (últimos 7 meses)
             </h2>
             <div className="h-80 bg-gradient-to-t from-white/5 to-transparent rounded-xl flex items-end justify-around p-4 gap-2">
-              {[60, 85, 45, 95, 70, 88, 92].map((height, i) => (
-                <div
-                  key={i}
-                  className="flex-1 bg-gradient-to-t from-[rgba(139,92,246,0.8)] to-[rgba(167,139,250,0.6)] rounded-t-lg shadow-[0_4px_15px_rgba(139,92,246,0.3)] hover:from-[rgba(139,92,246,1)] hover:to-[rgba(167,139,250,0.8)] hover:-translate-y-2 transition-all duration-300 cursor-pointer"
-                  style={{ height: `${height}%` }}
-                />
-              ))}
+              {stats.vendas_por_mes.map((venda, i) => {
+                const altura =
+                  maxQuantidade > 0
+                    ? (venda.quantidade / maxQuantidade) * 100
+                    : 0;
+                return (
+                  <div
+                    key={i}
+                    className="flex-1 flex flex-col items-center gap-2"
+                  >
+                    <div className="relative group w-full flex flex-col items-center">
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black/80 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap z-10">
+                        <div className="font-semibold">{venda.mes}</div>
+                        <div>Vendas: {venda.quantidade}</div>
+                        <div>Total: R$ {venda.total.toFixed(2)}</div>
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-black/80"></div>
+                      </div>
+
+                      {/* Barra */}
+                      <div
+                        className="w-full bg-gradient-to-t from-[rgba(139,92,246,0.8)] to-[rgba(167,139,250,0.6)] rounded-t-lg shadow-[0_4px_15px_rgba(139,92,246,0.3)] hover:from-[rgba(139,92,246,1)] hover:to-[rgba(167,139,250,0.8)] hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+                        style={{ height: `${Math.max(altura, 5)}%` }}
+                      />
+                    </div>
+                    <div className="text-white/70 text-xs font-medium">
+                      {venda.mes}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
 
@@ -254,13 +340,13 @@ export default function DashboardPage() {
             </div>
             <div className="flex justify-between items-center py-3 border-b border-white/10">
               <span className="text-white/70">Status</span>
-              <span className="text-green-400 font-semibold">
-                {user.is_active ? "Ativo" : "Inativo"}
-              </span>
+              <span className="text-green-400 font-semibold">Ativo</span>
             </div>
             <div className="flex justify-between items-center py-3">
               <span className="text-white/70">ID do Usuário</span>
-              <span className="text-white font-semibold">#{user.id}</span>
+              <span className="text-white font-semibold">
+                #{user.id_usuario}
+              </span>
             </div>
           </div>
         </div>
@@ -338,7 +424,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Settings Modal (existente) */}
+      {/* Settings Modal */}
       {showSettings && (
         <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"

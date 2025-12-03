@@ -265,6 +265,32 @@ export const getDashboard = async (): Promise<UserResponse> => {
   }
 };
 
+// ============================================
+// DASHBOARD STATS
+// ============================================
+
+export interface DashboardStats {
+  vendas_mes_atual: number;
+  vendas_mes_anterior: number;
+  total_clientes: number;
+  total_clientes_mes_anterior: number;
+  total_vendas_fechadas: number;
+  total_vendas: number;
+  conversao_rate: number;
+  ticket_medio: number;
+  vendas_por_mes: Array<{
+    mes: string;
+    total: number;
+    quantidade: number;
+  }>;
+}
+
+export const getDashboardStats = async (): Promise<DashboardStats> => {
+  const response = await fetchAPI("/user/dashboard/stats");
+  if (!response.ok) throw new Error("Erro ao buscar estatísticas");
+  return response.json();
+};
+
 export const logout = async () => {
   if (isExtension) {
     await removeToken();
