@@ -79,7 +79,7 @@ export async function PUT(
   }
 }
 
-export async function DELETE_VENDA(
+export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } },
 ) {
@@ -93,7 +93,9 @@ export async function DELETE_VENDA(
 
     const response = await fetch(`${API_URL}/vendas/${params.id}`, {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
@@ -103,7 +105,7 @@ export async function DELETE_VENDA(
       );
     }
 
-    return NextResponse.json({ success: true }, { status: 204 });
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Erro ao deletar venda:", error);
     return NextResponse.json(

@@ -274,7 +274,6 @@ export interface DashboardStats {
   vendas_mes_anterior: number;
   total_clientes: number;
   total_clientes_mes_anterior: number;
-  total_vendas_fechadas: number;
   total_vendas: number;
   conversao_rate: number;
   ticket_medio: number;
@@ -344,7 +343,10 @@ export const clientesAPI = {
     const response = await fetchAPI(`/clientes/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Erro ao deletar cliente");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Erro ao deletar cliente");
+    }
   },
 
   async buscarPorNome(nome: string): Promise<ClienteLead[]> {
@@ -408,7 +410,10 @@ export const chamadasAPI = {
     const response = await fetchAPI(`/chamadas/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Erro ao deletar chamada");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Erro ao deletar chamada");
+    }
   },
 };
 
@@ -454,7 +459,10 @@ export const vendasAPI = {
     const response = await fetchAPI(`/vendas/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Erro ao deletar venda");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Erro ao deletar venda");
+    }
   },
 };
 
@@ -490,14 +498,20 @@ export const historicoChatAPI = {
     const response = await fetchAPI(`/historico-chat/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Erro ao deletar mensagem");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Erro ao deletar mensagem");
+    }
   },
 
   async limparTudo(): Promise<void> {
     const response = await fetchAPI("/historico-chat", {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Erro ao limpar histórico");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Erro ao limpar histórico");
+    }
   },
 };
 
@@ -557,7 +571,10 @@ export const sugestoesAPI = {
     const response = await fetchAPI(`/sugestoes/${id}`, {
       method: "DELETE",
     });
-    if (!response.ok) throw new Error("Erro ao deletar sugestão");
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || "Erro ao deletar sugestão");
+    }
   },
 };
 
