@@ -4,13 +4,10 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import Loading from "@/components/Loading";
 import { useState, useEffect } from "react";
-import {
-  sugestoesAPI,
-  getDashboardStats,
-  DashboardStats,
-} from "@/lib/api-dual";
+import { sugestoesAPI, getDashboardStats, DashboardStats } from "@/lib/api-dual";
 import { SugestaoIA } from "@/types/api";
 import Link from "next/link";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -83,30 +80,27 @@ export default function DashboardPage() {
 
   // Calcular variações
   const variacaoVendas = stats.variacao_vendas;
-  const variacaoClientes =
-    stats.total_clientes_mes_anterior > 0
-      ? ((stats.total_clientes - stats.total_clientes_mes_anterior) /
-          stats.total_clientes_mes_anterior) *
-        100
-      : 0;
+  const variacaoClientes = stats.total_clientes_mes_anterior > 0
+    ? ((stats.total_clientes - stats.total_clientes_mes_anterior) / stats.total_clientes_mes_anterior * 100)
+    : 0;
 
   const statsCards = [
     {
       label: "Vendas do Mês",
       value: `R$ ${(stats.vendas_mes_atual / 1000).toFixed(1)}K`,
-      change: `${variacaoVendas >= 0 ? "↑" : "↓"} ${Math.abs(variacaoVendas).toFixed(0)}%`,
+      change: `${variacaoVendas >= 0 ? '↑' : '↓'} ${Math.abs(variacaoVendas).toFixed(0)}%`,
       positive: variacaoVendas >= 0,
     },
     {
       label: "Conversões",
       value: `${stats.conversao_rate.toFixed(0)}%`,
-      change: `${stats.total_vendas_fechadas}/${stats.total_vendas} vendas`,
+      change: `${stats.total_vendas}/${stats.total_clientes} vendas`,
       positive: stats.conversao_rate > 50,
     },
     {
       label: "Leads Ativos",
       value: stats.total_clientes.toString(),
-      change: `${variacaoClientes >= 0 ? "↑" : "↓"} ${Math.abs(variacaoClientes).toFixed(0)}%`,
+      change: `${variacaoClientes >= 0 ? '↑' : '↓'} ${Math.abs(variacaoClientes).toFixed(0)}%`,
       positive: variacaoClientes >= 0,
     },
     {
@@ -144,11 +138,28 @@ export default function DashboardPage() {
     { icon: "🎯", title: "Meta mensal atingida em 87%", time: "Ontem" },
   ];
 
-  // Calcular altura máxima para normalizar o gráfico
-  const maxQuantidade = Math.max(
-    ...stats.vendas_por_mes.map((v) => v.quantidade),
-    1,
-  );
+  // Preparar dados para o gráfico Recharts
+  const chartData = stats.vendas_por_mes.map(venda => ({
+    mes: venda.mes,
+    vendas: venda.quantidade,
+    total: venda.total
+  }));
+
+  // Tooltip customizado
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-black/90 backdrop-blur-lg border border-white/20 rounded-lg px-4 py-3 shadow-lg">
+          <p className="text-white font-semibold mb-1">{payload[0].payload.mes}</p>
+          <p className="text-green-400 text-sm">Vendas: {payload[0].value}</p>
+          <p className="text-blue-400 text-sm">
+            Total: R$ {payload[0].payload.total.toFixed(2)}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1e3c72] via-[#2a5298] to-[#7e22ce] relative overflow-x-hidden">
@@ -250,43 +261,45 @@ export default function DashboardPage() {
 
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-          {/* Chart Card - DADOS REAIS */}
+          {/* Chart Card - GRÁFICO COM RECHARTS */}
           <div className="lg:col-span-2 bg-white/10 backdrop-blur-[20px] border border-white/20 rounded-3xl p-8 shadow-[0_8px_32px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300">
             <h2 className="text-2xl font-semibold text-white mb-6">
               📊 Performance de Vendas (últimos 7 meses)
             </h2>
-            <div className="h-80 bg-gradient-to-t from-white/5 to-transparent rounded-xl flex items-end justify-around p-4 gap-2">
-              {stats.vendas_por_mes.map((venda, i) => {
-                const altura =
-                  maxQuantidade > 0
-                    ? (venda.quantidade / maxQuantidade) * 100
-                    : 0;
-                return (
-                  <div
-                    key={i}
-                    className="flex-1 flex flex-col items-center gap-2"
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                  <XAxis
+                    dataKey="mes"
+                    stroke="rgba(255,255,255,0.7)"
+                    style={{ fontSize: '12px' }}
+                  />
+                  <YAxis
+                    stroke="rgba(255,255,255,0.7)"
+                    style={{ fontSize: '12px' }}
+                  />
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(255,255,255,0.1)' }} />
+                  <Bar
+                    dataKey="vendas"
+                    fill="url(#colorGradient)"
+                    radius={[8, 8, 0, 0]}
                   >
-                    <div className="relative group w-full flex flex-col items-center">
-                      {/* Tooltip */}
-                      <div className="absolute bottom-full mb-2 hidden group-hover:block bg-black/80 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap z-10">
-                        <div className="font-semibold">{venda.mes}</div>
-                        <div>Vendas: {venda.quantidade}</div>
-                        <div>Total: R$ {venda.total.toFixed(2)}</div>
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 rotate-45 w-2 h-2 bg-black/80"></div>
-                      </div>
-
-                      {/* Barra */}
-                      <div
-                        className="w-full bg-gradient-to-t from-[rgba(139,92,246,0.8)] to-[rgba(167,139,250,0.6)] rounded-t-lg shadow-[0_4px_15px_rgba(139,92,246,0.3)] hover:from-[rgba(139,92,246,1)] hover:to-[rgba(167,139,250,0.8)] hover:-translate-y-2 transition-all duration-300 cursor-pointer"
-                        style={{ height: `${Math.max(altura, 5)}%` }}
+                    {chartData.map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={`rgba(139, 92, 246, ${0.6 + (index * 0.05)})`}
                       />
-                    </div>
-                    <div className="text-white/70 text-xs font-medium">
-                      {venda.mes}
-                    </div>
-                  </div>
-                );
-              })}
+                    ))}
+                  </Bar>
+                  <defs>
+                    <linearGradient id="colorGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="rgba(139,92,246,0.8)" stopOpacity={0.9}/>
+                      <stop offset="95%" stopColor="rgba(167,139,250,0.6)" stopOpacity={0.7}/>
+                    </linearGradient>
+                  </defs>
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
 
@@ -344,9 +357,7 @@ export default function DashboardPage() {
             </div>
             <div className="flex justify-between items-center py-3">
               <span className="text-white/70">ID do Usuário</span>
-              <span className="text-white font-semibold">
-                #{user.id_usuario}
-              </span>
+              <span className="text-white font-semibold">#{user.id_usuario}</span>
             </div>
           </div>
         </div>
